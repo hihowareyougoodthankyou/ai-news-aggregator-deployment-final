@@ -1,0 +1,28 @@
+[project]
+name = "ai-news-aggregator"
+version = "0.1.0"
+description = "AI news aggregator with daily digest emails"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "apscheduler>=3.11.2",
+    "groq>=0.4.0",
+    "beautifulsoup4>=4.14.3",
+    "feedparser>=6.0.12",
+    "openai>=2.16.0",
+    "psycopg2-binary>=2.9.11",
+    "pydantic>=2.12.5",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
+    "sqlalchemy>=2.0.46",
+    "trafilatura>=2.0.0",
+    "youtube-transcript-api>=1.2.4",
+]
+
+[project.scripts]
+run = "app.run:run"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.31.0",
+]
