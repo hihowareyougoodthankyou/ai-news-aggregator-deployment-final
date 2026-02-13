@@ -9,40 +9,14 @@ This guide walks you through running the AI News Digest on GitHub Actions so it 
 Before starting, you need:
 
 1. **A GitHub account** and your project pushed to a GitHub repository
-2. **A cloud PostgreSQL database** (free options: [Supabase](https://supabase.com), [Neon](https://neon.tech))
-3. **A Groq API key** – [groq.com](https://console.groq.com)
-4. **SMTP credentials** – Gmail App Password or another email service
+2. **A Groq API key** – [groq.com](https://console.groq.com)
+3. **SMTP credentials** – Gmail App Password or another email service
 
 ---
 
-## Part 1: Set Up a Cloud Database
+## Part 1: Get Your API Keys and SMTP Credentials
 
-GitHub Actions runs in the cloud and needs a database it can reach from the internet.
-
-### Option A: Supabase (Free)
-
-1. Go to [supabase.com](https://supabase.com) and sign up
-2. Click **New Project**
-3. Choose a name, password, and region → **Create new project**
-4. Wait for the project to be ready
-5. Go to **Project Settings** (gear icon) → **Database**
-6. Under **Connection string**, select **URI**
-7. Copy the connection string (looks like `postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres`)
-8. Replace `[YOUR-PASSWORD]` with your actual database password
-9. Save this URL – you’ll use it as `DATABASE_URL`
-
-### Option B: Neon (Free)
-
-1. Go to [neon.tech](https://neon.tech) and sign up
-2. Click **New Project**
-3. Choose a name and region → **Create project**
-4. On the dashboard, find **Connection string**
-5. Copy the connection string (looks like `postgresql://user:password@ep-xxx.region.aws.neon.tech/neondb?sslmode=require`)
-6. Save this URL – you’ll use it as `DATABASE_URL`
-
----
-
-## Part 2: Get Your API Keys and SMTP Credentials
+**Note:** The workflow uses a built-in PostgreSQL database – no external database needed.
 
 ### Groq API Key
 
@@ -55,12 +29,12 @@ GitHub Actions runs in the cloud and needs a database it can reach from the inte
 
 1. Turn on 2-Step Verification for your Google account
 2. Go to [Google Account → Security → App passwords](https://myaccount.google.com/apppasswords)
-3. Create an app password for “Mail”
+3. Create an app password for "Mail"
 4. Copy the 16-character password
 
 ---
 
-## Part 3: Add Secrets to GitHub
+## Part 2: Add Secrets to GitHub
 
 1. Open your repository on GitHub
 2. Click **Settings**
@@ -70,13 +44,14 @@ GitHub Actions runs in the cloud and needs a database it can reach from the inte
 
 | Name | Value | Notes |
 |------|-------|-------|
-| `DATABASE_URL` | Your full Postgres URL | From Supabase or Neon |
 | `GROQ_API_KEY` | Your Groq API key | Starts with `gsk_` |
 | `SMTP_SERVER` | `smtp.gmail.com` | For Gmail |
 | `SMTP_PORT` | `587` | For Gmail |
 | `SMTP_USERNAME` | Your Gmail address | e.g. `you@gmail.com` |
 | `SMTP_PASSWORD` | Your Gmail App Password | 16-character app password |
 | `EMAIL_RECIPIENT` | Where to send the digest | e.g. `you@gmail.com` |
+
+**Note:** The workflow uses a built-in PostgreSQL service – you don't need to add `DATABASE_URL`. Each run gets a fresh database.
 
 6. For each secret:
    - Click **New repository secret**
@@ -86,7 +61,7 @@ GitHub Actions runs in the cloud and needs a database it can reach from the inte
 
 ---
 
-## Part 4: Push the Workflow to GitHub
+## Part 3: Push the Workflow to GitHub
 
 1. Make sure the workflow file exists at `.github/workflows/daily-digest.yml`
 2. In your project folder, run:
@@ -99,11 +74,11 @@ git commit -m "Add GitHub Actions workflow for daily digest"
 git push origin main
 ```
 
-(Use `master` instead of `main` if that’s your default branch.)
+(Use `master` instead of `main` if that's your default branch.)
 
 ---
 
-## Part 5: Run a Test
+## Part 4: Run a Test
 
 1. On GitHub, open your repository
 2. Click the **Actions** tab
@@ -123,7 +98,7 @@ The job will:
 
 ---
 
-## Part 6: Check the Schedule
+## Part 5: Check the Schedule
 
 The workflow is set to run **every day at 1:30 PM EST**.
 
@@ -139,7 +114,7 @@ You can confirm it in **Actions** → **Daily Digest** → the schedule will app
 
 ### “relation 'articles' does not exist”
 
-Tables are created automatically. If you still see this, the database URL may be wrong. Check `DATABASE_URL` in your secrets.
+Tables are created automatically at the start of each run. If you see this, the run may have failed before table creation completed.
 
 ### “Email send failed”
 
@@ -149,8 +124,7 @@ Tables are created automatically. If you still see this, the database URL may be
 
 ### “Connection refused” or “Connection timed out”
 
-- `DATABASE_URL` must point to a cloud database, not `localhost`
-- Ensure the database allows connections from the internet (Supabase/Neon do by default)
+- The workflow uses a built-in PostgreSQL service – ensure you've pushed the latest workflow file
 
 ### Workflow doesn’t run on schedule
 
@@ -162,11 +136,9 @@ Tables are created automatically. If you still see this, the database URL may be
 
 ## Summary Checklist
 
-- [ ] Cloud database created (Supabase or Neon)
-- [ ] `DATABASE_URL` saved
 - [ ] Groq API key obtained
 - [ ] Gmail App Password created
-- [ ] All 7 secrets added in GitHub
+- [ ] All 6 secrets added in GitHub
 - [ ] Workflow file pushed to the repo
 - [ ] Manual test run completed
 - [ ] Digest email received
